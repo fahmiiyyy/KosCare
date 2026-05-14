@@ -190,13 +190,13 @@ fun ExpenseScreen(
                 Column {
 
                     Text(
-                        text = "Belum ada pengeluaran 😭",
+                        text = "Belum ada pengeluaran",
 
                         style = MaterialTheme.typography.titleMedium
                     )
 
                     Text(
-                        text = "Tambahkan pengeluaran pertama kamu"
+                        text = "Tambahkan pengeluaran pertama anda!"
                     )
                 }
 

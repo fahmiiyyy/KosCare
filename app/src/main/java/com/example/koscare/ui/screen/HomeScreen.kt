@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,34 +21,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.koscare.ui.theme.Background
 import com.example.koscare.ui.theme.Emerald
-import com.example.koscare.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(
 
-    onNavigate: (String) -> Unit,
-
-    viewModel: HomeViewModel = viewModel()
+    onNavigate: (String) -> Unit
 ) {
-
-    val uiState by
-    viewModel.uiState.collectAsState()
-
-    LaunchedEffect(Unit) {
-
-        viewModel.loadDashboard()
-    }
 
     Column(
         modifier = Modifier
@@ -64,8 +48,7 @@ fun HomeScreen(
         )
 
         Text(
-            text =
-                "Halo, ${uiState.userName} 👋",
+            text = "Home Page",
 
             style =
                 MaterialTheme
@@ -78,103 +61,45 @@ fun HomeScreen(
 
         Spacer(
             modifier =
-                Modifier.height(24.dp)
-        )
-
-        Card(
-
-            modifier =
-                Modifier.fillMaxWidth(),
-
-            shape =
-                RoundedCornerShape(28.dp),
-
-            colors =
-                CardDefaults.cardColors(
-                    containerColor =
-                        Emerald
-                )
-        ) {
-
-            Column(
-                modifier =
-                    Modifier.padding(24.dp)
-            ) {
-
-                Text(
-                    text =
-                        "Total Pengeluaran",
-
-                    color = Color.White
-                )
-
-                Spacer(
-                    modifier =
-                        Modifier.height(8.dp)
-                )
-
-                Text(
-                    text =
-                        "Rp ${uiState.totalExpense.toInt()}",
-
-                    style =
-                        MaterialTheme
-                            .typography
-                            .headlineMedium,
-
-                    color = Color.White,
-
-                    fontWeight =
-                        FontWeight.Bold
-                )
-            }
-        }
-
-        Spacer(
-            modifier =
                 Modifier.height(28.dp)
         )
 
-        Row(
+        HomeMenuCard(
+
             modifier =
                 Modifier.fillMaxWidth(),
 
-            horizontalArrangement =
-                Arrangement.spacedBy(16.dp)
-        ) {
+            title = "Expense",
 
-            HomeMenuCard(
+            icon =
+                Icons.Default.Payments,
 
-                modifier =
-                    Modifier.weight(1f),
+            onClick = {
 
-                title = "Expense",
+                onNavigate("expense")
+            }
+        )
 
-                icon =
-                    Icons.Default.Payments,
+        Spacer(
+            modifier =
+                Modifier.height(16.dp)
+        )
 
-                onClick = {
+        HomeMenuCard(
 
-                    onNavigate("expense")
-                }
-            )
+            modifier =
+                Modifier.fillMaxWidth(),
 
-            HomeMenuCard(
+            title = "Schedule",
 
-                modifier =
-                    Modifier.weight(1f),
+            icon =
+                Icons.Default.CalendarMonth,
 
-                title = "Schedule",
+            onClick = {
 
-                icon =
-                    Icons.Default.CalendarMonth,
-
-                onClick = {
-
-                    onNavigate("schedule")
-                }
-            )
-        }
+                onNavigate("schedule")
+            }
+        )
 
         Spacer(
             modifier =
@@ -206,7 +131,7 @@ fun HomeMenuCard(
 
     title: String,
 
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
 
     onClick: () -> Unit
 ) {
@@ -232,10 +157,16 @@ fun HomeMenuCard(
         Column(
 
             modifier =
-                Modifier.padding(24.dp),
+                Modifier.padding(
+                    horizontal = 24.dp,
+                    vertical = 28.dp
+                ),
 
             horizontalAlignment =
-                Alignment.CenterHorizontally
+                Alignment.Start,
+
+            verticalArrangement =
+                Arrangement.Center
         ) {
 
             Icon(
@@ -247,7 +178,7 @@ fun HomeMenuCard(
                 tint = Emerald,
 
                 modifier =
-                    Modifier.size(40.dp)
+                    Modifier.size(36.dp)
             )
 
             Spacer(
@@ -262,7 +193,7 @@ fun HomeMenuCard(
                 style =
                     MaterialTheme
                         .typography
-                        .titleMedium,
+                        .titleLarge,
 
                 fontWeight =
                     FontWeight.Bold
