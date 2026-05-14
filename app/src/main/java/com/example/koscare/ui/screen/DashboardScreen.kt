@@ -1,7 +1,11 @@
 package com.example.koscare.ui.screen
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -15,6 +19,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.koscare.navigation.BottomNavItem
+import com.example.koscare.ui.theme.Emerald
+import com.example.koscare.ui.screen.ShoppingScreen
 import com.example.koscare.viewmodel.ProfileViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -32,6 +38,23 @@ fun DashboardScreen() {
     )
 
     Scaffold(
+
+        floatingActionButton = {
+
+            FloatingActionButton(
+                onClick = {
+
+                },
+
+                containerColor = Emerald
+            ) {
+
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add"
+                )
+            }
+        },
 
         bottomBar = {
 

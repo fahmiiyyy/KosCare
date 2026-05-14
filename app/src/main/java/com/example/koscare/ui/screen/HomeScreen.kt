@@ -3,13 +3,17 @@ package com.example.koscare.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -23,9 +27,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.koscare.ui.theme.Background
 import com.example.koscare.ui.theme.Emerald
 
@@ -36,19 +43,67 @@ fun HomeScreen(
 ) {
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-            .padding(20.dp)
+
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(
+
+                    Brush.verticalGradient(
+
+                        colors = listOf(
+
+                            Color(0xFFF4FFF8),
+                            Color(0xFFFFFFFF)
+                        )
+                    )
+                )
+                .padding(
+                    horizontal = 20.dp,
+                    vertical = 18.dp
+                )
     ) {
+
+        Row(
+
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
+
+            horizontalArrangement =
+                Arrangement.Center,
+
+            verticalAlignment =
+                Alignment.CenterVertically
+        ) {
+
+
+            Text(
+
+                text = "KosCare",
+
+                style =
+                    MaterialTheme
+                        .typography
+                        .displaySmall,
+
+                fontWeight =
+                    FontWeight.ExtraBold,
+
+                color =
+                    Emerald
+            )
+        }
 
         Spacer(
             modifier =
-                Modifier.height(12.dp)
+                Modifier.height(34.dp)
         )
 
         Text(
-            text = "Home Page",
+
+            text =
+                "Halo Mahasiswa 👋",
 
             style =
                 MaterialTheme
@@ -56,23 +111,46 @@ fun HomeScreen(
                     .headlineMedium,
 
             fontWeight =
-                FontWeight.Bold
+                FontWeight.ExtraBold
         )
 
         Spacer(
             modifier =
-                Modifier.height(28.dp)
+                Modifier.height(8.dp)
+        )
+
+        Text(
+
+            text =
+                "Kelola kebutuhan kosmu dengan mudah.",
+
+            color =
+                Color.Gray,
+
+            style =
+                MaterialTheme
+                    .typography
+                    .bodyLarge
+        )
+
+        Spacer(
+            modifier =
+                Modifier.height(32.dp)
         )
 
         HomeMenuCard(
 
-            modifier =
-                Modifier.fillMaxWidth(),
+            title =
+                "Expense Tracker",
 
-            title = "Expense",
+            subtitle =
+                "Monitor rent, utilities, and daily spending.",
 
             icon =
                 Icons.Default.Payments,
+
+            iconBackground =
+                Emerald,
 
             onClick = {
 
@@ -82,18 +160,22 @@ fun HomeScreen(
 
         Spacer(
             modifier =
-                Modifier.height(16.dp)
+                Modifier.height(18.dp)
         )
 
         HomeMenuCard(
 
-            modifier =
-                Modifier.fillMaxWidth(),
+            title =
+                "Schedule Tracker",
 
-            title = "Schedule",
+            subtitle =
+                "Manage cleaning duties and quiet hours.",
 
             icon =
                 Icons.Default.CalendarMonth,
+
+            iconBackground =
+                Color(0xFFB7F0D8),
 
             onClick = {
 
@@ -103,18 +185,22 @@ fun HomeScreen(
 
         Spacer(
             modifier =
-                Modifier.height(16.dp)
+                Modifier.height(18.dp)
         )
 
         HomeMenuCard(
 
-            modifier =
-                Modifier.fillMaxWidth(),
+            title =
+                "Shopping List",
 
-            title = "Shopping",
+            subtitle =
+                "Coordinate communal groceries and supplies.",
 
             icon =
                 Icons.Default.ShoppingCart,
+
+            iconBackground =
+                Color(0xFF8FAF8F),
 
             onClick = {
 
@@ -127,11 +213,13 @@ fun HomeScreen(
 @Composable
 fun HomeMenuCard(
 
-    modifier: Modifier = Modifier,
-
     title: String,
 
+    subtitle: String,
+
     icon: ImageVector,
+
+    iconBackground: Color,
 
     onClick: () -> Unit
 ) {
@@ -139,65 +227,131 @@ fun HomeMenuCard(
     Card(
 
         modifier =
-            modifier.clickable {
+            Modifier
+                .fillMaxWidth()
+                .shadow(
+                    elevation = 12.dp,
+                    shape =
+                        RoundedCornerShape(28.dp)
+                )
+                .clickable {
 
-                onClick()
-            },
+                    onClick()
+                },
 
         shape =
-            RoundedCornerShape(24.dp),
+            RoundedCornerShape(28.dp),
 
         colors =
             CardDefaults.cardColors(
+
                 containerColor =
-                    MaterialTheme.colorScheme.surface
+                    Color.White
             )
     ) {
 
-        Column(
+        Box(
 
             modifier =
-                Modifier.padding(
-                    horizontal = 24.dp,
-                    vertical = 28.dp
-                ),
+                Modifier.background(
 
-            horizontalAlignment =
-                Alignment.Start,
+                    brush =
+                        Brush.horizontalGradient(
 
-            verticalArrangement =
-                Arrangement.Center
+                            colors = listOf(
+
+                                Color.White,
+
+                                Emerald.copy(
+                                    alpha = 0.06f
+                                )
+                            )
+                        )
+                )
         ) {
 
-            Icon(
-
-                imageVector = icon,
-
-                contentDescription = null,
-
-                tint = Emerald,
+            Row(
 
                 modifier =
-                    Modifier.size(36.dp)
-            )
+                    Modifier.padding(
+                        horizontal = 20.dp,
+                        vertical = 22.dp
+                    ),
 
-            Spacer(
-                modifier =
-                    Modifier.height(12.dp)
-            )
+                verticalAlignment =
+                    Alignment.CenterVertically
+            ) {
 
-            Text(
+                Box(
 
-                text = title,
+                    modifier =
+                        Modifier
+                            .size(58.dp)
+                            .shadow(
+                                elevation = 10.dp,
+                                shape = CircleShape
+                            )
+                            .background(
+                                iconBackground,
+                                CircleShape
+                            ),
 
-                style =
-                    MaterialTheme
-                        .typography
-                        .titleLarge,
+                    contentAlignment =
+                        Alignment.Center
+                ) {
 
-                fontWeight =
-                    FontWeight.Bold
-            )
+                    Icon(
+
+                        imageVector = icon,
+
+                        contentDescription = null,
+
+                        tint = Color.White,
+
+                        modifier =
+                            Modifier.size(28.dp)
+                    )
+                }
+
+                Spacer(
+                    modifier =
+                        Modifier.width(18.dp)
+                )
+
+                Column {
+
+                    Text(
+
+                        text = title,
+
+                        style =
+                            MaterialTheme
+                                .typography
+                                .titleMedium,
+
+                        fontWeight =
+                            FontWeight.Bold
+                    )
+
+                    Spacer(
+                        modifier =
+                            Modifier.height(4.dp)
+                    )
+
+                    Text(
+
+                        text = subtitle,
+
+                        color =
+                            Color.Gray,
+
+                        style =
+                            MaterialTheme
+                                .typography
+                                .bodyMedium
+                    )
+                }
+            }
         }
     }
 }
