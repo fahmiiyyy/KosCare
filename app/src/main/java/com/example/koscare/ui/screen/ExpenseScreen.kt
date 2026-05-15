@@ -2,6 +2,7 @@ package com.example.koscare.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,12 +10,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,18 +28,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.koscare.ui.theme.Background
 import com.example.koscare.ui.theme.Emerald
@@ -55,11 +62,16 @@ fun ExpenseScreen(
         mutableStateOf("")
     }
 
-    val expenses by expenseViewModel.expenses.collectAsState()
+    val expenses by expenseViewModel
+        .expenses
+        .collectAsState()
 
-    val isLoading by expenseViewModel.isLoading.collectAsState()
+    val isLoading by expenseViewModel
+        .isLoading
+        .collectAsState()
 
     LaunchedEffect(Unit) {
+
         expenseViewModel.getExpenses()
     }
 
@@ -67,205 +79,454 @@ fun ExpenseScreen(
         it.amount
     }
 
-    Column(
+    LazyColumn(
+
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
-            .padding(16.dp)
+            .padding(18.dp),
+
+        verticalArrangement =
+            Arrangement.spacedBy(16.dp)
     ) {
 
-        Text(
-            text = "Expense Tracker",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
+        item {
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Row(
 
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-
-            colors = CardDefaults.cardColors(
-                containerColor = Emerald
-            ),
-
-            shape = RoundedCornerShape(24.dp)
-        ) {
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp)
+                verticalAlignment =
+                    Alignment.CenterVertically
             ) {
 
                 Text(
-                    text = "Total Pengeluaran",
-                    color = MaterialTheme.colorScheme.onPrimary
+
+                    text = "💻",
+
+                    fontSize = 28.sp
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(
+                    modifier =
+                        Modifier.width(8.dp)
+                )
 
                 Text(
-                    text = formatRupiah(totalExpense),
 
-                    style = MaterialTheme.typography.headlineMedium,
+                    text = "Expenses KosCare",
 
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Emerald,
 
-                    fontWeight = FontWeight.Bold
+                    fontSize = 32.sp,
+
+                    fontWeight =
+                        FontWeight.ExtraBold
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        item {
 
-        OutlinedTextField(
-            value = title,
-            onValueChange = {
-                title = it
-            },
+            Card(
 
-            modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier.fillMaxWidth(),
 
-            label = {
-                Text("Nama Pengeluaran")
-            },
+                shape =
+                    RoundedCornerShape(30.dp),
 
-            shape = RoundedCornerShape(20.dp)
-        )
+                elevation =
+                    CardDefaults.cardElevation(
+                        defaultElevation = 10.dp
+                    )
+            ) {
 
-        Spacer(modifier = Modifier.height(12.dp))
+                Box(
 
-        OutlinedTextField(
-            value = amount,
-            onValueChange = {
-                amount = it
-            },
+                    modifier = Modifier
+                        .background(
 
-            modifier = Modifier.fillMaxWidth(),
+                            Brush.horizontalGradient(
 
-            label = {
-                Text("Jumlah")
-            },
+                                colors = listOf(
 
-            shape = RoundedCornerShape(20.dp)
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
-            onClick = {
-
-                if (
-                    title.isNotEmpty() &&
-                    amount.isNotEmpty()
+                                    Emerald,
+                                    Color(0xFF0F9D72)
+                                )
+                            )
+                        )
+                        .padding(24.dp)
                 ) {
 
-                    expenseViewModel.addExpense(
-                        title = title,
-                        amount = amount.toInt()
-                    )
+                    Row(
 
-                    title = ""
-                    amount = ""
+                        modifier =
+                            Modifier.fillMaxWidth(),
+
+                        horizontalArrangement =
+                            Arrangement.SpaceBetween,
+
+                        verticalAlignment =
+                            Alignment.CenterVertically
+                    ) {
+
+                        Column {
+
+                            Text(
+
+                                text =
+                                    "Total Expenses",
+
+                                color =
+                                    Color.White.copy(
+                                        alpha = 0.8f
+                                    )
+                            )
+
+                            Spacer(
+                                modifier =
+                                    Modifier.height(10.dp)
+                            )
+
+                            Text(
+
+                                text =
+                                    formatRupiah(totalExpense),
+
+                                fontSize = 34.sp,
+
+                                color =
+                                    Color.White,
+
+                                fontWeight =
+                                    FontWeight.ExtraBold
+                            )
+
+                            Spacer(
+                                modifier =
+                                    Modifier.height(6.dp)
+                            )
+
+                            Text(
+
+                                text =
+                                    "This month",
+
+                                color =
+                                    Color.White.copy(
+                                        alpha = 0.7f
+                                    )
+                            )
+                        }
+
+                        Icon(
+
+                            imageVector =
+                                Icons.Default.AccountBalanceWallet,
+
+                            contentDescription =
+                                null,
+
+                            tint =
+                                Color.White.copy(
+                                    alpha = 0.25f
+                                ),
+
+                            modifier =
+                                Modifier.size(90.dp)
+                        )
+                    }
                 }
-            },
-
-            modifier = Modifier.fillMaxWidth()
-        ) {
-
-            Text("Tambah Pengeluaran")
+            }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        item {
+
+            Card(
+
+                shape =
+                    RoundedCornerShape(28.dp),
+
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor =
+                            Color.White
+                    ),
+
+                elevation =
+                    CardDefaults.cardElevation(
+                        defaultElevation = 8.dp
+                    )
+            ) {
+
+                Column(
+
+                    modifier =
+                        Modifier.padding(20.dp)
+                ) {
+
+                    Text(
+
+                        text =
+                            "Quick Add",
+
+                        fontSize = 24.sp,
+
+                        fontWeight =
+                            FontWeight.Bold
+                    )
+
+                    Spacer(
+                        modifier =
+                            Modifier.height(20.dp)
+                    )
+
+                    OutlinedTextField(
+
+                        value = title,
+
+                        onValueChange = {
+                            title = it
+                        },
+
+                        modifier =
+                            Modifier.fillMaxWidth(),
+
+                        label = {
+                            Text("Description")
+                        },
+
+                        shape =
+                            RoundedCornerShape(16.dp)
+                    )
+
+                    Spacer(
+                        modifier =
+                            Modifier.height(14.dp)
+                    )
+
+                    OutlinedTextField(
+
+                        value = amount,
+
+                        onValueChange = {
+                            amount = it
+                        },
+
+                        modifier =
+                            Modifier.fillMaxWidth(),
+
+                        label = {
+                            Text("Amount")
+                        },
+
+                        shape =
+                            RoundedCornerShape(16.dp)
+                    )
+
+                    Spacer(
+                        modifier =
+                            Modifier.height(22.dp)
+                    )
+
+                    Button(
+
+                        onClick = {
+
+                            if (
+                                title.isNotEmpty() &&
+                                amount.isNotEmpty()
+                            ) {
+
+                                expenseViewModel.addExpense(
+
+                                    title = title,
+
+                                    amount = amount.toInt()
+                                )
+
+                                title = ""
+                                amount = ""
+                            }
+                        },
+
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+
+                        shape =
+                            RoundedCornerShape(16.dp),
+
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = Emerald
+                            )
+                    ) {
+
+                        Text(
+
+                            text =
+                                "+ Add Expense",
+
+                            fontSize = 18.sp,
+
+                            fontWeight =
+                                FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
+
+        item {
+
+            Text(
+
+                text =
+                    "Recent Expenses",
+
+                fontSize = 24.sp,
+
+                fontWeight =
+                    FontWeight.Bold
+            )
+        }
 
         if (isLoading) {
 
-            CircularProgressIndicator()
+            item {
+
+                CircularProgressIndicator()
+            }
 
         } else {
 
             if (expenses.isEmpty()) {
 
-                Column {
+                item {
 
-                    Text(
-                        text = "Belum ada pengeluaran",
+                    Column {
 
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                        Text(
 
-                    Text(
-                        text = "Tambahkan pengeluaran pertama anda!"
-                    )
+                            text =
+                                "Belum ada pengeluaran",
+
+                            style =
+                                MaterialTheme
+                                    .typography
+                                    .titleMedium
+                        )
+
+                        Text(
+                            text =
+                                "Tambahkan pengeluaran pertama anda!"
+                        )
+                    }
                 }
 
             } else {
 
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+                items(expenses) { expense ->
 
-                    items(expenses) { expense ->
+                    Card(
 
-                        Card(
-                            shape = RoundedCornerShape(20.dp),
+                        shape =
+                            RoundedCornerShape(24.dp),
 
-                            elevation = CardDefaults.cardElevation(
-                                defaultElevation = 4.dp
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor =
+                                    Color.White
+                            ),
+
+                        elevation =
+                            CardDefaults.cardElevation(
+                                defaultElevation = 6.dp
                             )
+                    ) {
+
+                        Row(
+
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(18.dp),
+
+                            horizontalArrangement =
+                                Arrangement.SpaceBetween,
+
+                            verticalAlignment =
+                                Alignment.CenterVertically
                         ) {
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
+                            Column {
 
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                Text(
+
+                                    text =
+                                        expense.title,
+
+                                    style =
+                                        MaterialTheme
+                                            .typography
+                                            .titleMedium,
+
+                                    fontWeight =
+                                        FontWeight.Bold
+                                )
+
+                                Spacer(
+                                    modifier =
+                                        Modifier.height(4.dp)
+                                )
+
+                                Text(
+                                    text =
+                                        expense.expense_date
+                                )
+                            }
+
+                            Row(
+
+                                verticalAlignment =
+                                    Alignment.CenterVertically
                             ) {
 
-                                Column {
+                                Text(
 
-                                    Text(
-                                        text = expense.title,
+                                    text =
+                                        formatRupiah(
+                                            expense.amount
+                                        ),
 
-                                        style = MaterialTheme.typography.titleMedium,
+                                    fontWeight =
+                                        FontWeight.Bold,
 
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    color =
+                                        Emerald
+                                )
 
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                IconButton(
 
-                                    Text(
-                                        text = expense.expense_date
-                                    )
-                                }
+                                    onClick = {
 
-                                Row {
+                                        expense.id?.let {
 
-                                    Text(
-                                        text = formatRupiah(expense.amount),
-
-                                        fontWeight = FontWeight.Bold,
-
-                                        color = Emerald
-                                    )
-
-                                    IconButton(
-                                        onClick = {
-
-                                            expense.id?.let {
-
-                                                expenseViewModel.deleteExpense(it)
-                                            }
+                                            expenseViewModel
+                                                .deleteExpense(it)
                                         }
-                                    ) {
-
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            contentDescription = "Delete"
-                                        )
                                     }
+                                ) {
+
+                                    Icon(
+
+                                        imageVector =
+                                            Icons.Default.Delete,
+
+                                        contentDescription =
+                                            "Delete"
+                                    )
                                 }
                             }
                         }
@@ -281,6 +542,8 @@ fun formatRupiah(
 ): String {
 
     return NumberFormat
-        .getCurrencyInstance(Locale("id", "ID"))
+        .getCurrencyInstance(
+            Locale("id", "ID")
+        )
         .format(amount)
 }

@@ -5,41 +5,26 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.koscare.ui.theme.Background
@@ -58,7 +43,7 @@ fun ShoppingScreen(
     }
 
     var quantity by remember {
-        mutableIntStateOf(1)
+        mutableStateOf("1")
     }
 
     var selectedImageUri by remember {
@@ -80,248 +65,341 @@ fun ShoppingScreen(
         shoppingViewModel.getItems()
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
-            .padding(16.dp)
+            .padding(16.dp),
+
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
-        Text(
-            text = "Shopping List",
+        item {
 
-            style = MaterialTheme.typography.headlineMedium,
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-            fontWeight = FontWeight.Bold
-        )
+                Text(
+                    text = "💻",
+                    fontSize = 28.sp
+                )
 
-        Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.width(10.dp))
 
-        OutlinedTextField(
-            value = itemName,
-            onValueChange = {
-                itemName = it
-            },
+                Text(
+                    text = "Shopping KosCare",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Emerald
+                )
+            }
 
-            modifier = Modifier.fillMaxWidth(),
+            Spacer(modifier = Modifier.height(20.dp))
 
-            label = {
-                Text("Nama Barang")
-            },
-
-            shape = RoundedCornerShape(20.dp)
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = quantity.toString(),
-            onValueChange = {
-
-                quantity = it.toIntOrNull() ?: 1
-            },
-
-            modifier = Modifier.fillMaxWidth(),
-
-            label = {
-                Text("Quantity")
-            },
-
-            shape = RoundedCornerShape(20.dp)
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
-            onClick = {
-
-                launcher.launch("image/*")
-            },
-
-            modifier = Modifier.fillMaxWidth()
-        ) {
-
-            Text("Pilih Gambar")
-        }
-
-        selectedImageUri?.let { uri ->
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Image(
-                painter = rememberAsyncImagePainter(uri),
-
-                contentDescription = null,
-
+            // FORM CARD
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp),
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(28.dp)
+                    ),
 
-                contentScale = ContentScale.Crop
-            )
-        }
+                shape = RoundedCornerShape(28.dp),
 
-        Spacer(modifier = Modifier.height(16.dp))
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFEAF4F0)
+                )
+            ) {
 
-        Button(
-            onClick = {
-
-                if (itemName.isNotEmpty()) {
-
-                    selectedImageUri?.let { uri ->
-
-                        shoppingViewModel.uploadImageAndAddItem(
-                            context = context,
-                            imageUri = uri,
-                            itemName = itemName,
-                            quantity = quantity
-                        )
-
-                    } ?: run {
-
-                        shoppingViewModel.addItem(
-                            itemName = itemName,
-                            quantity = quantity,
-                            imageUrl = null
-                        )
-                    }
-
-                    itemName = ""
-                    quantity = 1
-                    selectedImageUri = null
-                }
-            },
-
-            modifier = Modifier.fillMaxWidth()
-        ) {
-
-            Text("Tambah Barang")
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-
-            items(items) { item ->
-
-                Card(
-                    shape = RoundedCornerShape(20.dp),
-
-                    colors = CardDefaults.cardColors(
-                        containerColor =
-                            if (item.is_bought)
-                                Emerald.copy(alpha = 0.2f)
-
-                            else
-                                MaterialTheme.colorScheme.surface
-                    )
+                Column(
+                    modifier = Modifier.padding(18.dp)
                 ) {
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
+                    Text(
+                        text = "🛒 Add to List",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF111827)
+                    )
+
+                    Spacer(modifier = Modifier.height(18.dp))
+
+                    // ITEM NAME + IMAGE
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        item.image_url?.let { imageUrl ->
+                        OutlinedTextField(
+                            value = itemName,
+                            onValueChange = {
+                                itemName = it
+                            },
 
-                            Image(
-                                painter =
-                                    rememberAsyncImagePainter(imageUrl),
+                            placeholder = {
+                                Text("Item name...")
+                            },
 
+                            modifier = Modifier.weight(1f),
+
+                            shape = RoundedCornerShape(18.dp),
+
+                            singleLine = true
+                        )
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Button(
+                            onClick = {
+
+                                launcher.launch("image/*")
+                            },
+
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFF4F4F4)
+                            ),
+
+                            shape = RoundedCornerShape(18.dp),
+
+                            contentPadding = PaddingValues(0.dp),
+
+                            modifier = Modifier.size(62.dp)
+                        ) {
+
+                            Icon(
+                                imageVector = Icons.Default.Image,
                                 contentDescription = null,
+                                tint = Color(0xFF10B981)
+                            )
+                        }
+                    }
 
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(180.dp),
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                                contentScale = ContentScale.Crop
+                    // PREVIEW IMAGE
+                    selectedImageUri?.let { uri ->
+
+                        Image(
+                            painter = rememberAsyncImagePainter(uri),
+
+                            contentDescription = null,
+
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(180.dp)
+                                .clip(RoundedCornerShape(20.dp)),
+
+                            contentScale = ContentScale.Crop
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    // QUANTITY + BUTTON
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        OutlinedTextField(
+                            value = quantity,
+
+                            onValueChange = {
+
+                                quantity = it
+                            },
+
+                            label = {
+                                Text("Quantity")
+                            },
+
+                            modifier = Modifier.weight(1f),
+
+                            shape = RoundedCornerShape(18.dp),
+
+                            singleLine = true
+                        )
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Button(
+                            onClick = {
+
+                                if (itemName.isNotEmpty()) {
+
+                                    val qty =
+                                        quantity.toIntOrNull() ?: 1
+
+                                    selectedImageUri?.let { uri ->
+
+                                        shoppingViewModel
+                                            .uploadImageAndAddItem(
+                                                context = context,
+                                                imageUri = uri,
+                                                itemName = itemName,
+                                                quantity = qty
+                                            )
+
+                                    } ?: run {
+
+                                        shoppingViewModel.addItem(
+                                            itemName = itemName,
+                                            quantity = qty,
+                                            imageUrl = null
+                                        )
+                                    }
+
+                                    itemName = ""
+                                    quantity = "1"
+                                    selectedImageUri = null
+                                }
+                            },
+
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Emerald
+                            ),
+
+                            shape = RoundedCornerShape(18.dp),
+
+                            modifier = Modifier.height(56.dp)
+                        ) {
+
+                            Text(
+                                text = "Add",
+                                fontSize = 18.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // LIST ITEM
+        items(items) { item ->
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+
+                shape = RoundedCornerShape(24.dp),
+
+                colors = CardDefaults.cardColors(
+                    containerColor =
+                        if (item.is_bought)
+                            Emerald.copy(alpha = 0.15f)
+
+                        else
+                            MaterialTheme.colorScheme.surface
+                )
+            ) {
+
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+
+                    item.image_url?.let { imageUrl ->
+
+                        Image(
+                            painter =
+                                rememberAsyncImagePainter(imageUrl),
+
+                            contentDescription = null,
+
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(180.dp)
+                                .clip(RoundedCornerShape(20.dp)),
+
+                            contentScale = ContentScale.Crop
+                        )
+
+                        Spacer(modifier = Modifier.height(14.dp))
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+
+                        horizontalArrangement =
+                            Arrangement.SpaceBetween,
+
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+
+                            Text(
+                                text = item.item_name,
+
+                                style =
+                                    MaterialTheme.typography.titleLarge,
+
+                                fontWeight = FontWeight.Bold
                             )
 
                             Spacer(
-                                modifier = Modifier.height(12.dp)
+                                modifier = Modifier.height(4.dp)
+                            )
+
+                            Text(
+                                text = "Quantity: ${item.quantity}",
+
+                                color = Color.Gray
                             )
                         }
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
+                        Row {
 
-                            horizontalArrangement =
-                                Arrangement.SpaceBetween
-                        ) {
+                            IconButton(
+                                onClick = {
 
-                            Column(
-                                modifier = Modifier.weight(1f)
+                                    shoppingViewModel
+                                        .updateBoughtStatus(item)
+                                }
                             ) {
 
-                                Text(
-                                    text = item.item_name,
+                                Icon(
+                                    imageVector = Icons.Default.Done,
 
-                                    style =
-                                        MaterialTheme.typography.titleMedium,
+                                    contentDescription = null,
 
-                                    fontWeight = FontWeight.Bold
-                                )
+                                    tint =
+                                        if (item.is_bought)
+                                            Emerald
 
-                                Spacer(
-                                    modifier = Modifier.height(4.dp)
-                                )
-
-                                Text(
-                                    text = "Jumlah: ${item.quantity}"
+                                        else
+                                            Color.Gray
                                 )
                             }
 
-                            Row {
+                            IconButton(
+                                onClick = {
 
-                                IconButton(
-                                    onClick = {
+                                    item.id?.let {
 
                                         shoppingViewModel
-                                            .updateBoughtStatus(item)
+                                            .deleteItem(it)
                                     }
-                                ) {
-
-                                    Icon(
-                                        imageVector = Icons.Default.Done,
-
-                                        contentDescription = null,
-
-                                        tint =
-                                            if (item.is_bought)
-                                                Emerald
-
-                                            else
-                                                MaterialTheme
-                                                    .colorScheme
-                                                    .onSurface
-                                    )
                                 }
+                            ) {
 
-                                IconButton(
-                                    onClick = {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
 
-                                        item.id?.let {
+                                    contentDescription = null,
 
-                                            shoppingViewModel
-                                                .deleteItem(it)
-                                        }
-                                    }
-                                ) {
-
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-
-                                        contentDescription = null
-                                    )
-                                }
+                                    tint = Color.Red
+                                )
                             }
                         }
                     }
                 }
             }
+        }
+
+        item {
+
+            Spacer(modifier = Modifier.height(90.dp))
         }
     }
 }

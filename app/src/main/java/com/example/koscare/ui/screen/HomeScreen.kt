@@ -33,8 +33,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.koscare.ui.theme.Background
 import com.example.koscare.ui.theme.Emerald
+
 
 @Composable
 fun HomeScreen(
@@ -63,36 +65,72 @@ fun HomeScreen(
                     vertical = 18.dp
                 )
     ) {
-
         Row(
 
             modifier =
                 Modifier
                     .fillMaxWidth(),
 
-            horizontalArrangement =
-                Arrangement.Center,
-
             verticalAlignment =
                 Alignment.CenterVertically
         ) {
 
+            Card(
 
-            Text(
+                shape =
+                    RoundedCornerShape(18.dp),
 
-                text = "KosCare",
+                colors =
+                    CardDefaults.cardColors(
 
-                style =
-                    MaterialTheme
-                        .typography
-                        .displaySmall,
+                        containerColor =
+                            Color.White
+                    ),
 
-                fontWeight =
-                    FontWeight.ExtraBold,
+                elevation =
+                    CardDefaults.cardElevation(
+                        defaultElevation = 6.dp
+                    )
+            ) {
 
-                color =
-                    Emerald
-            )
+                Row(
+
+                    modifier =
+                        Modifier.padding(
+                            horizontal = 16.dp,
+                            vertical = 10.dp
+                        ),
+
+                    verticalAlignment =
+                        Alignment.CenterVertically
+                ) {
+
+                    Text(
+
+                        text = "💻",
+
+                        fontSize = 34.sp
+                    )
+
+                    Spacer(
+                        modifier =
+                            Modifier.width(10.dp)
+                    )
+
+                    Text(
+
+                        text = "KosCare",
+
+                        fontSize = 38.sp,
+
+                        fontWeight =
+                            FontWeight.ExtraBold,
+
+                        color =
+                            Emerald
+                    )
+                }
+            }
         }
 
         Spacer(
