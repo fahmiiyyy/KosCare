@@ -33,7 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.koscare.ui.theme.Background
 import com.example.koscare.ui.theme.Emerald
@@ -41,7 +40,7 @@ import com.example.koscare.viewmodel.ProfileViewModel
 
 @Composable
 fun ProfileScreen(
-    navController: NavController,
+    onLogout: () -> Unit,
     viewModel: ProfileViewModel
 ) {
 
@@ -270,15 +269,7 @@ fun ProfileScreen(
 
                 viewModel.logout {
 
-                    navController.navigate("login") {
-
-                        popUpTo("dashboard") {
-
-                            inclusive = true
-                        }
-
-                        launchSingleTop = true
-                    }
+                    onLogout()
                 }
             },
 
@@ -293,75 +284,75 @@ fun ProfileScreen(
 
             Text("Logout")
         }
+    }
 
-        if (showImageDialog) {
+    if (showImageDialog) {
 
-            Dialog(
+        Dialog(
 
-                onDismissRequest = {
+            onDismissRequest = {
 
-                    showImageDialog = false
+                showImageDialog = false
 
-                    scale = 1f
-                }
+                scale = 1f
+            }
+        ) {
+
+            Box(
+
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.Black),
+
+                contentAlignment =
+                    Alignment.Center
             ) {
 
-                Box(
+                Image(
+
+                    painter =
+                        rememberAsyncImagePainter(
+
+                            model =
+                                imageUri
+                                    ?: profile?.profile_image_url
+                        ),
+
+                    contentDescription =
+                        null,
 
                     modifier =
                         Modifier
-                            .fillMaxSize()
-                            .background(Color.Black),
 
-                    contentAlignment =
-                        Alignment.Center
-                ) {
+                            .fillMaxWidth()
 
-                    Image(
+                            .graphicsLayer(
 
-                        painter =
-                            rememberAsyncImagePainter(
+                                scaleX = scale,
 
-                                model =
-                                    imageUri
-                                        ?: profile?.profile_image_url
-                            ),
+                                scaleY = scale
+                            )
 
-                        contentDescription =
-                            null,
+                            .pointerInput(Unit) {
 
-                        modifier =
-                            Modifier
+                                detectTransformGestures {
 
-                                .fillMaxWidth()
+                                        _, _, zoom, _ ->
 
-                                .graphicsLayer(
+                                    scale *= zoom
 
-                                    scaleX = scale,
+                                    scale =
+                                        scale.coerceIn(
+                                            1f,
+                                            5f
+                                        )
+                                }
+                            },
 
-                                    scaleY = scale
-                                )
-
-                                .pointerInput(Unit) {
-
-                                    detectTransformGestures {
-
-                                            _, _, zoom, _ ->
-
-                                        scale *= zoom
-
-                                        scale =
-                                            scale.coerceIn(
-                                                1f,
-                                                5f
-                                            )
-                                    }
-                                },
-
-                        contentScale =
-                            ContentScale.Fit
-                    )
-                }
+                    contentScale =
+                        ContentScale.Fit
+                )
             }
         }
     }

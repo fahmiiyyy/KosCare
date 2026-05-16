@@ -17,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +55,14 @@ fun LoginScreen(
     val isLoading by authViewModel.isLoading.collectAsState()
     val errorMessage by authViewModel.errorMessage.collectAsState()
     val isSuccess by authViewModel.isSuccess.collectAsState()
+
+    // ← FIX: pakai LaunchedEffect agar onLoginSuccess hanya dipanggil
+    //         sekali saat isSuccess berubah true, bukan setiap recompose
+    LaunchedEffect(isSuccess) {
+        if (isSuccess) {
+            onLoginSuccess()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -126,16 +135,12 @@ fun LoginScreen(
 
         Button(
             onClick = {
-
                 if (isLoginMode) {
-
                     authViewModel.login(
                         email = email,
                         password = password
                     )
-
                 } else {
-
                     authViewModel.register(
                         email = email,
                         password = password
@@ -155,13 +160,10 @@ fun LoginScreen(
         ) {
 
             if (isLoading) {
-
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
-
             } else {
-
                 Text(
                     text = if (isLoginMode) {
                         "Login"
@@ -179,7 +181,6 @@ fun LoginScreen(
                 isLoginMode = !isLoginMode
             }
         ) {
-
             Text(
                 text = if (isLoginMode) {
                     "Belum punya akun? Register"
@@ -190,9 +191,7 @@ fun LoginScreen(
         }
 
         errorMessage?.let {
-
             Spacer(modifier = Modifier.height(12.dp))
-
             Text(
                 text = it,
                 color = MaterialTheme.colorScheme.error
@@ -200,18 +199,13 @@ fun LoginScreen(
         }
 
         if (isSuccess) {
-
-            onLoginSuccess()
-
             Spacer(modifier = Modifier.height(12.dp))
-
             Text(
                 text = if (isLoginMode) {
                     "Login berhasil"
                 } else {
                     "Register berhasil"
                 },
-
                 color = Emerald
             )
         }

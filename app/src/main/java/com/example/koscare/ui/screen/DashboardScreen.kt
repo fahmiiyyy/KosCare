@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,7 +20,7 @@ import com.example.koscare.viewmodel.ProfileViewModel
 
 @Composable
 fun DashboardScreen(
-    rootNavController: NavController
+    onLogout: () -> Unit
 ) {
 
     val navController = rememberNavController()
@@ -40,21 +39,27 @@ fun DashboardScreen(
 
             NavigationBar {
 
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val navBackStackEntry by
+                navController.currentBackStackEntryAsState()
 
-                val currentRoute = navBackStackEntry?.destination?.route
+                val currentRoute =
+                    navBackStackEntry?.destination?.route
 
                 items.forEach { item ->
 
                     NavigationBarItem(
 
-                        selected = currentRoute == item.route,
+                        selected =
+                            currentRoute == item.route,
 
                         onClick = {
 
                             navController.navigate(item.route) {
 
-                                popUpTo(navController.graph.findStartDestination().id)
+                                popUpTo(
+                                    navController.graph
+                                        .findStartDestination().id
+                                )
 
                                 launchSingleTop = true
                             }
@@ -79,13 +84,19 @@ fun DashboardScreen(
     ) { innerPadding ->
 
         NavHost(
-            navController = navController,
-            startDestination = BottomNavItem.Home.route,
 
-            modifier = Modifier.padding(innerPadding)
+            navController = navController,
+
+            startDestination =
+                BottomNavItem.Home.route,
+
+            modifier =
+                Modifier.padding(innerPadding)
         ) {
 
-            composable(BottomNavItem.Home.route) {
+            composable(
+                BottomNavItem.Home.route
+            ) {
 
                 HomeScreen(
 
@@ -96,27 +107,41 @@ fun DashboardScreen(
                 )
             }
 
-            composable(BottomNavItem.Expense.route) {
+            composable(
+                BottomNavItem.Expense.route
+            ) {
+
                 ExpenseScreen()
             }
 
-            composable(BottomNavItem.Schedule.route) {
+            composable(
+                BottomNavItem.Schedule.route
+            ) {
+
                 ScheduleScreen()
             }
 
-            composable(BottomNavItem.Profile.route) {
+            composable(
+                BottomNavItem.Shopping.route
+            ) {
 
-                val profileViewModel: ProfileViewModel =
-                    viewModel()
-
-                ProfileScreen(
-                    navController = rootNavController,
-                    viewModel = profileViewModel
-                )
+                ShoppingScreen()
             }
 
-            composable(BottomNavItem.Shopping.route) {
-                ShoppingScreen()
+            composable(
+                BottomNavItem.Profile.route
+            ) {
+
+                val profileViewModel:
+                        ProfileViewModel = viewModel()
+
+                ProfileScreen(
+
+                    onLogout = onLogout,
+
+                    viewModel =
+                        profileViewModel
+                )
             }
         }
     }

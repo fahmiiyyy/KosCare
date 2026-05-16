@@ -1,21 +1,12 @@
 package com.example.koscare.navigation
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.runtime.*
 import com.example.koscare.ui.screen.DashboardScreen
 import com.example.koscare.ui.screen.LoginScreen
 import com.example.koscare.viewmodel.AuthViewModel
 
 @Composable
 fun AppNavigation() {
-
-    val navController = rememberNavController()
 
     val authViewModel = remember {
         AuthViewModel()
@@ -27,41 +18,25 @@ fun AppNavigation() {
         )
     }
 
-    NavHost(
-        navController = navController,
+    if (isLoggedIn) {
 
-        startDestination =
-            if (isLoggedIn)
-                "dashboard"
-            else
-                "login"
-    ) {
+        DashboardScreen(
 
-        composable("login") {
+            onLogout = {
+                authViewModel.logout()  // ← reset _isSuccess di dalam sini
+                isLoggedIn = false
+            }
+        )
 
-            LoginScreen(
+    } else {
 
-                authViewModel = authViewModel,
+        LoginScreen(
 
-                onLoginSuccess = {
+            authViewModel = authViewModel,
 
-                    isLoggedIn = true
-
-                    navController.navigate("dashboard") {
-
-                        popUpTo("login") {
-                            inclusive = true
-                        }
-                    }
-                }
-            )
-        }
-
-        composable("dashboard") {
-
-            DashboardScreen(
-                rootNavController = navController
-            )
-        }
+            onLoginSuccess = {
+                isLoggedIn = true
+            }
+        )
     }
 }

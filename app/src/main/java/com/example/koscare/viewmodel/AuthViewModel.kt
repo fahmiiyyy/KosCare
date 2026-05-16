@@ -24,19 +24,13 @@ class AuthViewModel : ViewModel() {
         email: String,
         password: String
     ) {
-
         viewModelScope.launch {
-
             _isLoading.value = true
-
             val result = repository.register(email, password)
-
             _isLoading.value = false
-
             result.onSuccess {
                 _isSuccess.value = true
             }
-
             result.onFailure {
                 _errorMessage.value = it.message
             }
@@ -47,19 +41,13 @@ class AuthViewModel : ViewModel() {
         email: String,
         password: String
     ) {
-
         viewModelScope.launch {
-
             _isLoading.value = true
-
             val result = repository.login(email, password)
-
             _isLoading.value = false
-
             result.onSuccess {
                 _isSuccess.value = true
             }
-
             result.onFailure {
                 _errorMessage.value = it.message
             }
@@ -67,9 +55,9 @@ class AuthViewModel : ViewModel() {
     }
 
     fun logout() {
-
         viewModelScope.launch {
             repository.logout()
+            _isSuccess.value = false  // ← reset agar LoginScreen tidak auto-login lagi
         }
     }
 
