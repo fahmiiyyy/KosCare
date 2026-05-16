@@ -4,19 +4,39 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.koscare.ui.theme.Background
+import com.example.koscare.ui.theme.Emerald
 import com.example.koscare.viewmodel.ProfileViewModel
 
 @Composable
@@ -30,13 +50,19 @@ fun ProfileScreen(
     val profile by viewModel.profile.collectAsState()
 
     var fullName by remember {
-
         mutableStateOf("")
     }
 
     var imageUri by remember {
-
         mutableStateOf<Uri?>(null)
+    }
+
+    var showImageDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var scale by remember {
+        mutableStateOf(1f)
     }
 
     LaunchedEffect(Unit) {
@@ -63,9 +89,11 @@ fun ProfileScreen(
         }
 
     Column(
+
         modifier =
             Modifier
                 .fillMaxSize()
+                .background(Background)
                 .padding(24.dp),
 
         horizontalAlignment =
@@ -73,55 +101,84 @@ fun ProfileScreen(
     ) {
 
         Text(
+
             text = "Profile",
+
             style =
                 MaterialTheme.typography.headlineMedium,
 
-            fontWeight = FontWeight.Bold
+            fontWeight =
+                FontWeight.Bold
         )
 
         Spacer(
             modifier =
-                Modifier.height(24.dp)
+                Modifier.height(28.dp)
         )
 
-        Image(
-            painter =
-                rememberAsyncImagePainter(
-                    model =
-                        imageUri
-                            ?: profile?.profile_image_url
-                ),
+        Box(
 
-            contentDescription = null,
-
-            modifier =
-                Modifier
-                    .size(140.dp)
-                    .clip(CircleShape),
-
-            contentScale =
-                ContentScale.Crop
-        )
-
-        Spacer(
-            modifier =
-                Modifier.height(16.dp)
-        )
-
-        Button(
-            onClick = {
-
-                launcher.launch("image/*")
-            }
+            contentAlignment =
+                Alignment.BottomEnd
         ) {
 
-            Text("Pilih Foto")
+            Image(
+
+                painter =
+                    rememberAsyncImagePainter(
+
+                        model =
+                            imageUri
+                                ?: profile?.profile_image_url
+                    ),
+
+                contentDescription =
+                    null,
+
+                modifier =
+                    Modifier
+                        .size(150.dp)
+                        .clip(CircleShape)
+                        .clickable {
+
+                            showImageDialog = true
+                        },
+
+                contentScale =
+                    ContentScale.Crop
+            )
+
+            FloatingActionButton(
+
+                onClick = {
+
+                    launcher.launch("image/*")
+                },
+
+                modifier =
+                    Modifier.size(46.dp),
+
+                containerColor =
+                    Emerald
+            ) {
+
+                Icon(
+
+                    imageVector =
+                        Icons.Default.Edit,
+
+                    contentDescription =
+                        null,
+
+                    tint =
+                        Color.White
+                )
+            }
         }
 
         Spacer(
             modifier =
-                Modifier.height(16.dp)
+                Modifier.height(28.dp)
         )
 
         OutlinedTextField(
@@ -139,12 +196,17 @@ fun ProfileScreen(
             },
 
             modifier =
-                Modifier.fillMaxWidth()
+                Modifier.fillMaxWidth(),
+
+            shape =
+                RoundedCornerShape(18.dp),
+
+            singleLine = true
         )
 
         Spacer(
             modifier =
-                Modifier.height(20.dp)
+                Modifier.height(24.dp)
         )
 
         Button(
@@ -155,15 +217,20 @@ fun ProfileScreen(
 
                     viewModel
                         .uploadImageAndSaveProfile(
+
                             context = context,
+
                             imageUri = imageUri!!,
+
                             fullName = fullName
                         )
 
                 } else {
 
                     viewModel.updateProfile(
+
                         fullName = fullName,
+
                         imageUrl =
                             profile?.profile_image_url
                     )
@@ -171,15 +238,30 @@ fun ProfileScreen(
             },
 
             modifier =
-                Modifier.fillMaxWidth()
+                Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+
+            shape =
+                RoundedCornerShape(18.dp),
+
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = Emerald
+                )
         ) {
 
-            Text("Simpan Profile")
+            Text(
+
+                text = "Simpan Profile",
+
+                fontSize = 16.sp
+            )
         }
 
         Spacer(
             modifier =
-                Modifier.height(16.dp)
+                Modifier.height(18.dp)
         )
 
         OutlinedButton(
@@ -190,16 +272,97 @@ fun ProfileScreen(
 
                     navController.navigate("login") {
 
-                        popUpTo(0)
+                        popUpTo("dashboard") {
+
+                            inclusive = true
+                        }
+
+                        launchSingleTop = true
                     }
                 }
             },
 
             modifier =
-                Modifier.fillMaxWidth()
+                Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+
+            shape =
+                RoundedCornerShape(18.dp)
         ) {
 
             Text("Logout")
+        }
+
+        if (showImageDialog) {
+
+            Dialog(
+
+                onDismissRequest = {
+
+                    showImageDialog = false
+
+                    scale = 1f
+                }
+            ) {
+
+                Box(
+
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(Color.Black),
+
+                    contentAlignment =
+                        Alignment.Center
+                ) {
+
+                    Image(
+
+                        painter =
+                            rememberAsyncImagePainter(
+
+                                model =
+                                    imageUri
+                                        ?: profile?.profile_image_url
+                            ),
+
+                        contentDescription =
+                            null,
+
+                        modifier =
+                            Modifier
+
+                                .fillMaxWidth()
+
+                                .graphicsLayer(
+
+                                    scaleX = scale,
+
+                                    scaleY = scale
+                                )
+
+                                .pointerInput(Unit) {
+
+                                    detectTransformGestures {
+
+                                            _, _, zoom, _ ->
+
+                                        scale *= zoom
+
+                                        scale =
+                                            scale.coerceIn(
+                                                1f,
+                                                5f
+                                            )
+                                    }
+                                },
+
+                        contentScale =
+                            ContentScale.Fit
+                    )
+                }
+            }
         }
     }
 }

@@ -1,6 +1,9 @@
 package com.example.koscare.ui.screen
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +38,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.koscare.ui.theme.Background
 import com.example.koscare.ui.theme.Emerald
 import com.example.koscare.viewmodel.ScheduleViewModel
+import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun ScheduleScreen(
@@ -56,7 +62,58 @@ fun ScheduleScreen(
         mutableStateOf("")
     }
 
-    val schedules by scheduleViewModel.schedules.collectAsState()
+    val schedules by scheduleViewModel
+        .schedules
+        .collectAsState()
+
+    val context = LocalContext.current
+
+    val calendar = Calendar.getInstance()
+
+    val datePickerDialog = DatePickerDialog(
+
+        context,
+
+        { _, year, month, dayOfMonth ->
+
+            scheduleDate =
+                String.format(
+                    Locale.getDefault(),
+                "%04d-%02d-%02d",
+                year,
+                month + 1,
+                dayOfMonth
+            )
+        },
+
+        calendar.get(Calendar.YEAR),
+
+        calendar.get(Calendar.MONTH),
+
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
+
+    val timePickerDialog = TimePickerDialog(
+
+        context,
+
+        { _, hour, minute ->
+
+            scheduleTime =
+                String.format(
+                    Locale.getDefault(),
+                    "%02d:%02d",
+                    hour,
+                    minute
+                )
+        },
+
+        calendar.get(Calendar.HOUR_OF_DAY),
+
+        calendar.get(Calendar.MINUTE),
+
+        true
+    )
 
     LaunchedEffect(Unit) {
 
@@ -64,139 +121,220 @@ fun ScheduleScreen(
     }
 
     LazyColumn(
+
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
             .padding(16.dp),
 
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement =
+            Arrangement.spacedBy(16.dp)
     ) {
 
         item {
 
-            // HEADER
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment =
+                    Alignment.CenterVertically
             ) {
 
-                Text(
-                    text = "📅",
-                    fontSize = 28.sp
+                Spacer(
+                    modifier =
+                        Modifier.width(10.dp)
                 )
 
-                Spacer(modifier = Modifier.width(10.dp))
-
                 Text(
-                    text = "KosCare",
+
+                    text = "Schedule KosCare",
+
                     fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
+
+                    fontWeight =
+                        FontWeight.Bold,
+
                     color = Emerald
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(
+                modifier =
+                    Modifier.height(20.dp)
+            )
 
-            // FORM CARD
             Card(
-                modifier = Modifier.fillMaxWidth(),
 
-                shape = RoundedCornerShape(28.dp),
+                modifier =
+                    Modifier.fillMaxWidth(),
 
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFEAF4F0)
-                )
+                shape =
+                    RoundedCornerShape(28.dp),
+
+                colors =
+                    CardDefaults.cardColors(
+
+                        containerColor =
+                            Color(0xFFEAF4F0)
+                    )
             ) {
 
                 Column(
-                    modifier = Modifier.padding(18.dp)
+
+                    modifier =
+                        Modifier.padding(18.dp)
                 ) {
 
                     Text(
-                        text = "📝 Add Schedule",
+
+                        text = "Add Schedule",
+
                         fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
+
+                        fontWeight =
+                            FontWeight.Bold
                     )
 
-                    Spacer(modifier = Modifier.height(18.dp))
+                    Spacer(
+                        modifier =
+                            Modifier.height(18.dp)
+                    )
 
                     OutlinedTextField(
+
                         value = title,
+
                         onValueChange = {
                             title = it
                         },
 
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier =
+                            Modifier.fillMaxWidth(),
 
                         placeholder = {
                             Text("Activity title...")
                         },
 
-                        shape = RoundedCornerShape(18.dp),
+                        shape =
+                            RoundedCornerShape(18.dp),
 
                         singleLine = true
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(
+                        modifier =
+                            Modifier.height(12.dp)
+                    )
 
                     OutlinedTextField(
+
                         value = description,
+
                         onValueChange = {
                             description = it
                         },
 
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier =
+                            Modifier.fillMaxWidth(),
 
                         placeholder = {
                             Text("Notes...")
                         },
 
-                        shape = RoundedCornerShape(18.dp)
+                        shape =
+                            RoundedCornerShape(18.dp)
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(
+                        modifier =
+                            Modifier.height(12.dp)
+                    )
 
                     Row {
 
-                        OutlinedTextField(
-                            value = scheduleDate,
-                            onValueChange = {
-                                scheduleDate = it
-                            },
+                        Box(
+                            modifier = Modifier.weight(1f)
+                        ) {
 
-                            modifier = Modifier.weight(1f),
+                            OutlinedTextField(
 
-                            placeholder = {
-                                Text("2026-05-14")
-                            },
+                                value = scheduleDate,
 
-                            shape = RoundedCornerShape(18.dp),
+                                onValueChange = {},
 
-                            singleLine = true
+                                modifier =
+                                    Modifier.fillMaxWidth(),
+
+                                placeholder = {
+                                    Text("Select Date")
+                                },
+
+                                shape =
+                                    RoundedCornerShape(18.dp),
+
+                                singleLine = true,
+
+                                readOnly = true
+                            )
+
+                            Box(
+
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .clickable {
+
+                                        datePickerDialog.show()
+                                    }
+                            )
+                        }
+
+                        Spacer(
+                            modifier =
+                                Modifier.width(12.dp)
                         )
 
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Box(
+                            modifier = Modifier.weight(1f)
+                        ) {
 
-                        OutlinedTextField(
-                            value = scheduleTime,
-                            onValueChange = {
-                                scheduleTime = it
-                            },
+                            OutlinedTextField(
 
-                            modifier = Modifier.weight(1f),
+                                value = scheduleTime,
 
-                            placeholder = {
-                                Text("20:00")
-                            },
+                                onValueChange = {},
 
-                            shape = RoundedCornerShape(18.dp),
+                                modifier =
+                                    Modifier.fillMaxWidth(),
 
-                            singleLine = true
-                        )
+                                placeholder = {
+                                    Text("Select Time")
+                                },
+
+                                shape =
+                                    RoundedCornerShape(18.dp),
+
+                                singleLine = true,
+
+                                readOnly = true
+                            )
+
+                            Box(
+
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .clickable {
+
+                                        timePickerDialog.show()
+                                    }
+                            )
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(18.dp))
+                    Spacer(
+                        modifier =
+                            Modifier.height(18.dp)
+                    )
 
                     Button(
+
                         onClick = {
 
                             if (
@@ -207,9 +345,13 @@ fun ScheduleScreen(
                             ) {
 
                                 scheduleViewModel.addSchedule(
+
                                     title = title,
+
                                     description = description,
+
                                     scheduleDate = scheduleDate,
+
                                     scheduleTime = scheduleTime
                                 )
 
@@ -224,15 +366,19 @@ fun ScheduleScreen(
                             .fillMaxWidth()
                             .height(56.dp),
 
-                        shape = RoundedCornerShape(18.dp),
+                        shape =
+                            RoundedCornerShape(18.dp),
 
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Emerald
-                        )
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = Emerald
+                            )
                     ) {
 
                         Text(
+
                             text = "Add Schedule",
+
                             fontSize = 17.sp
                         )
                     }
@@ -240,25 +386,37 @@ fun ScheduleScreen(
             }
         }
 
-        // SCHEDULE LIST
         items(schedules) { schedule ->
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
 
-                shape = RoundedCornerShape(24.dp),
+                modifier =
+                    Modifier.fillMaxWidth(),
 
-                colors = CardDefaults.cardColors(
-                    containerColor =
-                        if (schedule.status)
-                            Emerald.copy(alpha = 0.15f)
+                shape =
+                    RoundedCornerShape(24.dp),
 
-                        else
-                            MaterialTheme.colorScheme.surface
-                )
+                colors =
+                    CardDefaults.cardColors(
+
+                        containerColor =
+
+                            if (schedule.status)
+
+                                Emerald.copy(
+                                    alpha = 0.15f
+                                )
+
+                            else
+
+                                MaterialTheme
+                                    .colorScheme
+                                    .surface
+                    )
             ) {
 
                 Row(
+
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(18.dp),
@@ -266,49 +424,64 @@ fun ScheduleScreen(
                     horizontalArrangement =
                         Arrangement.SpaceBetween,
 
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment =
+                        Alignment.CenterVertically
                 ) {
 
                     Column(
-                        modifier = Modifier.weight(1f)
+
+                        modifier =
+                            Modifier.weight(1f)
                     ) {
 
                         Text(
+
                             text = schedule.title,
 
                             style =
-                                MaterialTheme.typography.titleLarge,
+                                MaterialTheme
+                                    .typography
+                                    .titleLarge,
 
-                            fontWeight = FontWeight.Bold
+                            fontWeight =
+                                FontWeight.Bold
                         )
 
                         Spacer(
-                            modifier = Modifier.height(6.dp)
+                            modifier =
+                                Modifier.height(6.dp)
                         )
 
                         Text(
-                            text = schedule.description,
 
-                            color = Color.Gray
+                            text =
+                                schedule.description,
+
+                            color =
+                                Color.Gray
                         )
 
                         Spacer(
-                            modifier = Modifier.height(10.dp)
+                            modifier =
+                                Modifier.height(10.dp)
                         )
 
                         Text(
+
                             text =
                                 "${schedule.schedule_date} • ${schedule.schedule_time}",
 
                             color = Emerald,
 
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight =
+                                FontWeight.SemiBold
                         )
                     }
 
                     Row {
 
                         IconButton(
+
                             onClick = {
 
                                 scheduleViewModel
@@ -317,20 +490,27 @@ fun ScheduleScreen(
                         ) {
 
                             Icon(
-                                imageVector = Icons.Default.Done,
 
-                                contentDescription = null,
+                                imageVector =
+                                    Icons.Default.Done,
+
+                                contentDescription =
+                                    null,
 
                                 tint =
+
                                     if (schedule.status)
+
                                         Emerald
 
                                     else
+
                                         Color.Gray
                             )
                         }
 
                         IconButton(
+
                             onClick = {
 
                                 schedule.id?.let {
@@ -342,9 +522,12 @@ fun ScheduleScreen(
                         ) {
 
                             Icon(
-                                imageVector = Icons.Default.Delete,
 
-                                contentDescription = null,
+                                imageVector =
+                                    Icons.Default.Delete,
+
+                                contentDescription =
+                                    null,
 
                                 tint = Color.Red
                             )
@@ -356,7 +539,10 @@ fun ScheduleScreen(
 
         item {
 
-            Spacer(modifier = Modifier.height(90.dp))
+            Spacer(
+                modifier =
+                    Modifier.height(90.dp)
+            )
         }
     }
 }

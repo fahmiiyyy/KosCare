@@ -98,12 +98,6 @@ fun ExpenseScreen(
                     Alignment.CenterVertically
             ) {
 
-                Text(
-
-                    text = "💻",
-
-                    fontSize = 28.sp
-                )
 
                 Spacer(
                     modifier =

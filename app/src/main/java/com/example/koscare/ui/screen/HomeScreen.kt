@@ -105,12 +105,6 @@ fun HomeScreen(
                         Alignment.CenterVertically
                 ) {
 
-                    Text(
-
-                        text = "💻",
-
-                        fontSize = 34.sp
-                    )
 
                     Spacer(
                         modifier =
