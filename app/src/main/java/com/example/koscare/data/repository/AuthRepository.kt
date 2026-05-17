@@ -13,7 +13,6 @@ class AuthRepository {
     ): Result<Unit> {
 
         return try {
-
             client.auth.signUpWith(io.github.jan.supabase.gotrue.providers.builtin.Email) {
                 this.email = email
                 this.password = password
