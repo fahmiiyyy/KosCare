@@ -256,16 +256,18 @@ fun ScheduleScreen(
         }
 
         items(schedules) { schedule ->
-            Card(
+                Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (schedule.status)
-                        Emerald.copy(alpha = 0.12f)
-                    else
-                        Color.White
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (schedule.status)
+                            Emerald
+                        else
+                            Color.White
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 4.dp
+                    )
             ) {
                 Row(
                     modifier = Modifier
@@ -277,15 +279,26 @@ fun ScheduleScreen(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = schedule.title,
+                            color = if (schedule.status) Color.White else Color.Black,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = schedule.description, color = Color.Gray, fontSize = 13.sp)
+                        Text(
+                            text = schedule.description,
+                            color = if (schedule.status)
+                                Color.White.copy(alpha = 0.85f)
+                            else
+                                Color.Gray,
+                            fontSize = 13.sp
+                        )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = "${schedule.schedule_date}  •  ${schedule.schedule_time}",
-                            color = Emerald,
+                            color = if (schedule.status)
+                                Color.White
+                            else
+                                Emerald,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 13.sp
                         )
@@ -295,7 +308,10 @@ fun ScheduleScreen(
                             Icon(
                                 imageVector = Icons.Default.Done,
                                 contentDescription = "Selesai",
-                                tint = if (schedule.status) Emerald else Color.Gray
+                                tint = if (schedule.status)
+                                    Color.White
+                                else
+                                    Color(0xFFD1D5DB)
                             )
                         }
                         IconButton(onClick = {
