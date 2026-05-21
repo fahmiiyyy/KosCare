@@ -233,8 +233,6 @@ fun ShoppingScreen(
                                 .padding(32.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(text = "🛒", fontSize = 40.sp)
-                            Spacer(modifier = Modifier.height(8.dp))
                             Text(text = "Daftar belanja kosong", fontWeight = FontWeight.SemiBold)
                             Text(
                                 text = "Tambahkan item yang perlu dibeli!",

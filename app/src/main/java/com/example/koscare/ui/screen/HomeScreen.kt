@@ -72,7 +72,10 @@ fun HomeScreen(
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
             Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Spacer(modifier = Modifier.width(10.dp))
@@ -88,7 +91,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(28.dp))
 
         Text(
-            text = "Halo, ${uiState.userName} 👋",
+            text = "Halo, ${uiState.userName} !",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.ExtraBold
         )
@@ -113,7 +116,7 @@ fun HomeScreen(
 
         HomeMenuCard(
             title = "Schedule Tracker",
-            subtitle = "Kelola jadwal dan kegiatan",
+            subtitle = "Kelola jadwal dan kegiatan.",
             icon = Icons.Default.CalendarMonth,
             iconBackground = Color(0xFF34D399),
             onClick = { onNavigate("schedule") }
@@ -123,7 +126,7 @@ fun HomeScreen(
 
         HomeMenuCard(
             title = "Shopping List",
-            subtitle = "Catat belanja kebutuhan kos",
+            subtitle = "Catat belanja kebutuhan kos.",
             icon = Icons.Default.ShoppingCart,
             iconBackground = Color(0xFF6EE7B7),
             onClick = { onNavigate("shopping") }

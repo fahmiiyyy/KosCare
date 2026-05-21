@@ -242,8 +242,6 @@ fun ScheduleScreen(
                             .padding(32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "📅", fontSize = 40.sp)
-                        Spacer(modifier = Modifier.height(8.dp))
                         Text(text = "Belum ada jadwal", fontWeight = FontWeight.SemiBold)
                         Text(
                             text = "Tambahkan jadwal pertamamu!",
