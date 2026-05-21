@@ -132,15 +132,11 @@ fun DashboardScreen(
                 BottomNavItem.Profile.route
             ) {
 
-                val profileViewModel:
-                        ProfileViewModel = viewModel()
+                val profileViewModel: ProfileViewModel = viewModel()
 
                 ProfileScreen(
-
                     onLogout = onLogout,
-
-                    viewModel =
-                        profileViewModel
+                    viewModel = profileViewModel
                 )
             }
         }

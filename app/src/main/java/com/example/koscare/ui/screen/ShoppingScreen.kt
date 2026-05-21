@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
@@ -19,11 +20,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -37,360 +38,282 @@ import com.example.koscare.viewmodel.ShoppingViewModel
 fun ShoppingScreen(
     shoppingViewModel: ShoppingViewModel = viewModel()
 ) {
-
     val context = LocalContext.current
+    var itemName by remember { mutableStateOf("") }
+    var quantity by remember { mutableStateOf("1") }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var previewImage by remember { mutableStateOf<String?>(null) }
 
-    var itemName by remember {
-        mutableStateOf("")
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        selectedImageUri = uri
+        shoppingViewModel.clearError()
     }
-
-    var quantity by remember {
-        mutableStateOf("1")
-    }
-
-    var selectedImageUri by remember {
-        mutableStateOf<Uri?>(null)
-    }
-
-    var previewImage by remember {
-        mutableStateOf<String?>(null)
-    }
-
-    val launcher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent()
-        ) { uri ->
-
-            selectedImageUri = uri
-        }
 
     val items by shoppingViewModel.items.collectAsState()
+    val isLoading by shoppingViewModel.isLoading.collectAsState()
+    val errorMessage by shoppingViewModel.errorMessage.collectAsState()
 
     LaunchedEffect(Unit) {
-
         shoppingViewModel.getItems()
     }
 
     Box {
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Background)
                 .padding(16.dp),
-
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            item {
+                Text(
+                    text = "Shopping List",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Emerald
+                )
+            }
 
             item {
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    Text(
-                        text = "Shopping KosCare",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Emerald
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(
-                            elevation = 8.dp,
-                            shape = RoundedCornerShape(28.dp)
-                        ),
-
-                    shape = RoundedCornerShape(28.dp),
-
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFEAF4F0)
-                    )
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEAF4F0))
                 ) {
-
-                    Column(
-                        modifier = Modifier.padding(18.dp)
-                    ) {
-
+                    Column(modifier = Modifier.padding(18.dp)) {
                         Text(
-                            text = "🛒 Add to List",
-                            fontSize = 22.sp,
+                            text = "🛒 Tambah Item",
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF111827)
                         )
 
-                        Spacer(modifier = Modifier.height(18.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             OutlinedTextField(
                                 value = itemName,
                                 onValueChange = {
                                     itemName = it
+                                    shoppingViewModel.clearError()
                                 },
-
-                                placeholder = {
-                                    Text("Item name...")
-                                },
-
+                                placeholder = { Text("Nama item...") },
                                 modifier = Modifier.weight(1f),
-
-                                shape = RoundedCornerShape(18.dp),
-
+                                shape = RoundedCornerShape(14.dp),
                                 singleLine = true
                             )
 
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(10.dp))
 
-                            Button(
-                                onClick = {
-
-                                    launcher.launch("image/*")
-                                },
-
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFF4F4F4)
-                                ),
-
-                                shape = RoundedCornerShape(18.dp),
-
-                                contentPadding = PaddingValues(0.dp),
-
-                                modifier = Modifier.size(62.dp)
+                            OutlinedButton(
+                                onClick = { launcher.launch("image/*") },
+                                shape = RoundedCornerShape(14.dp),
+                                modifier = Modifier.size(56.dp),
+                                contentPadding = PaddingValues(0.dp)
                             ) {
-
                                 Icon(
                                     imageVector = Icons.Default.Image,
-                                    contentDescription = null,
-                                    tint = Color(0xFF10B981)
+                                    contentDescription = "Pilih foto",
+                                    tint = if (selectedImageUri != null) Emerald else Color.Gray
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
                         selectedImageUri?.let { uri ->
-
+                            Spacer(modifier = Modifier.height(12.dp))
                             Image(
                                 painter = rememberAsyncImagePainter(uri),
-
                                 contentDescription = null,
-
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(180.dp)
-                                    .clip(RoundedCornerShape(20.dp)),
-
+                                    .height(160.dp)
+                                    .clip(RoundedCornerShape(16.dp)),
                                 contentScale = ContentScale.Crop
                             )
-
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Foto dipilih ✓",
+                                color = Emerald,
+                                fontSize = 12.sp
+                            )
                         }
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        Spacer(modifier = Modifier.height(10.dp))
 
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             OutlinedTextField(
                                 value = quantity,
-
                                 onValueChange = {
-
                                     quantity = it
+                                    shoppingViewModel.clearError()
                                 },
-
-                                label = {
-                                    Text("Quantity")
-                                },
-
+                                label = { Text("Jumlah") },
                                 modifier = Modifier.weight(1f),
-
-                                shape = RoundedCornerShape(18.dp),
-
-                                singleLine = true
+                                shape = RoundedCornerShape(14.dp),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                             )
 
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(10.dp))
 
                             Button(
                                 onClick = {
-
-                                    if (itemName.isNotEmpty()) {
-
-                                        val qty =
-                                            quantity.toIntOrNull() ?: 1
-
+                                    if (itemName.isNotBlank()) {
+                                        val qty = quantity.toIntOrNull()?.coerceAtLeast(1) ?: 1
                                         selectedImageUri?.let { uri ->
-
-                                            shoppingViewModel
-                                                .uploadImageAndAddItem(
-                                                    context = context,
-                                                    imageUri = uri,
-                                                    itemName = itemName,
-                                                    quantity = qty
-                                                )
-
+                                            shoppingViewModel.uploadImageAndAddItem(
+                                                context = context,
+                                                imageUri = uri,
+                                                itemName = itemName,
+                                                quantity = qty
+                                            )
                                         } ?: run {
-
                                             shoppingViewModel.addItem(
                                                 itemName = itemName,
                                                 quantity = qty,
                                                 imageUrl = null
                                             )
                                         }
-
                                         itemName = ""
                                         quantity = "1"
                                         selectedImageUri = null
                                     }
                                 },
-
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Emerald
-                                ),
-
-                                shape = RoundedCornerShape(18.dp),
-
-                                modifier = Modifier.height(56.dp)
+                                colors = ButtonDefaults.buttonColors(containerColor = Emerald),
+                                shape = RoundedCornerShape(14.dp),
+                                modifier = Modifier.height(56.dp),
+                                enabled = !isLoading && itemName.isNotBlank()
                             ) {
-
-                                Text(
-                                    text = "Add",
-                                    fontSize = 18.sp
-                                )
+                                if (isLoading) {
+                                    CircularProgressIndicator(
+                                        color = Color.White,
+                                        strokeWidth = 2.dp,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                } else {
+                                    Text(text = "Tambah", fontSize = 16.sp)
+                                }
                             }
+                        }
+
+                        errorMessage?.let {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "⚠️ $it",
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 13.sp
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Loading
+            if (isLoading && items.isEmpty()) {
+                item {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Emerald)
+                    }
+                }
+            }
+
+            // Empty state
+            if (!isLoading && items.isEmpty()) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = "🛒", fontSize = 40.sp)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(text = "Daftar belanja kosong", fontWeight = FontWeight.SemiBold)
+                            Text(
+                                text = "Tambahkan item yang perlu dibeli!",
+                                color = Color.Gray,
+                                fontSize = 13.sp
+                            )
                         }
                     }
                 }
             }
 
             items(items) { item ->
-
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-
-                    shape = RoundedCornerShape(24.dp),
-
+                    shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor =
-                            if (item.is_bought)
-                                Emerald.copy(alpha = 0.15f)
-
-                            else
-                                MaterialTheme.colorScheme.surface
-                    )
+                        containerColor = if (item.is_bought)
+                            Emerald.copy(alpha = 0.1f)
+                        else
+                            Color.White
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-
+                    Column(modifier = Modifier.padding(16.dp)) {
                         item.image_url?.let { imageUrl ->
-
                             Image(
-                                painter =
-                                    rememberAsyncImagePainter(imageUrl),
-
+                                painter = rememberAsyncImagePainter(imageUrl),
                                 contentDescription = null,
-
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(180.dp)
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .clickable {
-
-                                        previewImage = imageUrl
-                                    },
-
+                                    .height(160.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .clickable { previewImage = imageUrl },
                                 contentScale = ContentScale.Crop
                             )
-
-                            Spacer(modifier = Modifier.height(14.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
                         }
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-
-                            horizontalArrangement =
-                                Arrangement.SpaceBetween,
-
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-
-                            Column(
-                                modifier = Modifier.weight(1f)
-                            ) {
-
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = item.item_name,
-
-                                    style =
-                                        MaterialTheme.typography.titleLarge,
-
+                                    style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
-
-                                Spacer(
-                                    modifier = Modifier.height(4.dp)
-                                )
-
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(
-                                    text = "Quantity: ${item.quantity}",
-
-                                    color = Color.Gray
+                                    text = "Jumlah: ${item.quantity}",
+                                    color = Color.Gray,
+                                    fontSize = 13.sp
                                 )
-                            }
-
-                            Row {
-
-                                IconButton(
-                                    onClick = {
-
-                                        shoppingViewModel
-                                            .updateBoughtStatus(item)
-                                    }
-                                ) {
-
-                                    Icon(
-                                        imageVector = Icons.Default.Done,
-
-                                        contentDescription = null,
-
-                                        tint =
-                                            if (item.is_bought)
-                                                Emerald
-
-                                            else
-                                                Color.Gray
+                                if (item.is_bought) {
+                                    Text(
+                                        text = "✓ Sudah dibeli",
+                                        color = Emerald,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.SemiBold
                                     )
                                 }
-
-                                IconButton(
-                                    onClick = {
-
-                                        item.id?.let {
-
-                                            shoppingViewModel
-                                                .deleteItem(it)
-                                        }
-                                    }
-                                ) {
-
+                            }
+                            Row {
+                                IconButton(onClick = { shoppingViewModel.updateBoughtStatus(item) }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Done,
+                                        contentDescription = "Tandai dibeli",
+                                        tint = if (item.is_bought) Emerald else Color.Gray
+                                    )
+                                }
+                                IconButton(onClick = {
+                                    item.id?.let { shoppingViewModel.deleteItem(it) }
+                                }) {
                                     Icon(
                                         imageVector = Icons.Default.Delete,
-
-                                        contentDescription = null,
-
-                                        tint = Color.Red
+                                        contentDescription = "Hapus",
+                                        tint = Color(0xFFEF4444)
                                     )
                                 }
                             }
@@ -399,45 +322,20 @@ fun ShoppingScreen(
                 }
             }
 
-            item {
-
-                Spacer(modifier = Modifier.height(90.dp))
-            }
+            item { Spacer(modifier = Modifier.height(80.dp)) }
         }
 
+        // Dialog preview foto
         previewImage?.let { imageUrl ->
-
-            Dialog(
-
-                onDismissRequest = {
-
-                    previewImage = null
-                }
-            ) {
-
-                Card(
-
-                    shape =
-                        RoundedCornerShape(28.dp)
-                ) {
-
+            Dialog(onDismissRequest = { previewImage = null }) {
+                Card(shape = RoundedCornerShape(24.dp)) {
                     Image(
-
-                        painter =
-                            rememberAsyncImagePainter(
-                                imageUrl
-                            ),
-
-                        contentDescription =
-                            null,
-
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .height(420.dp),
-
-                        contentScale =
-                            ContentScale.Fit
+                        painter = rememberAsyncImagePainter(imageUrl),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(400.dp),
+                        contentScale = ContentScale.Fit
                     )
                 }
             }

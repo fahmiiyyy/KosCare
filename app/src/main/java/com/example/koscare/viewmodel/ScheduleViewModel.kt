@@ -13,20 +13,28 @@ import kotlinx.coroutines.launch
 class ScheduleViewModel : ViewModel() {
 
     private val repository = ScheduleRepository()
-
     private val client = SupabaseClientProvider.client
 
-    private val _schedules =
-        MutableStateFlow<List<Schedule>>(emptyList())
-
+    private val _schedules = MutableStateFlow<List<Schedule>>(emptyList())
     val schedules = _schedules.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage = _errorMessage.asStateFlow()
+
     fun getSchedules() {
-
         viewModelScope.launch {
-
-            _schedules.value =
-                repository.getSchedules()
+            _isLoading.value = true
+            _errorMessage.value = null
+            try {
+                _schedules.value = repository.getSchedules()
+            } catch (e: Exception) {
+                _errorMessage.value = "Gagal memuat jadwal. Periksa koneksi internet kamu."
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 
@@ -36,54 +44,59 @@ class ScheduleViewModel : ViewModel() {
         scheduleDate: String,
         scheduleTime: String
     ) {
-
         viewModelScope.launch {
-
-            val userId =
-                client.auth.currentUserOrNull()?.id
-
-            if (userId != null) {
-
+            _isLoading.value = true
+            _errorMessage.value = null
+            try {
+                val userId = client.auth.currentUserOrNull()?.id
+                if (userId == null) {
+                    _errorMessage.value = "Sesi kamu sudah berakhir. Silakan login ulang."
+                    return@launch
+                }
                 repository.addSchedule(
-
                     Schedule(
-                        title = title,
-                        description = description,
+                        title = title.trim(),
+                        description = description.trim(),
                         schedule_date = scheduleDate,
                         schedule_time = scheduleTime,
                         user_id = userId
                     )
                 )
-
                 getSchedules()
+            } catch (e: Exception) {
+                _errorMessage.value = "Gagal menambah jadwal. Coba lagi ya."
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
-    fun deleteSchedule(
-        scheduleId: String
-    ) {
-
+    fun deleteSchedule(scheduleId: String) {
         viewModelScope.launch {
-
-            repository.deleteSchedule(scheduleId)
-
-            getSchedules()
+            try {
+                repository.deleteSchedule(scheduleId)
+                getSchedules()
+            } catch (e: Exception) {
+                _errorMessage.value = "Gagal menghapus jadwal. Coba lagi."
+            }
         }
     }
 
-    fun updateStatus(
-        schedule: Schedule
-    ) {
-
+    fun updateStatus(schedule: Schedule) {
         viewModelScope.launch {
-
-            repository.updateScheduleStatus(
-                scheduleId = schedule.id ?: "",
-                status = !schedule.status
-            )
-
-            getSchedules()
+            try {
+                repository.updateScheduleStatus(
+                    scheduleId = schedule.id ?: return@launch,
+                    status = !schedule.status
+                )
+                getSchedules()
+            } catch (e: Exception) {
+                _errorMessage.value = "Gagal memperbarui status. Coba lagi."
+            }
         }
+    }
+
+    fun clearError() {
+        _errorMessage.value = null
     }
 }

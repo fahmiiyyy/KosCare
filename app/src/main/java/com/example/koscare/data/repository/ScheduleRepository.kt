@@ -9,32 +9,25 @@ class ScheduleRepository {
     private val client = SupabaseClientProvider.client
 
     suspend fun getSchedules(): List<Schedule> {
-
         return client
             .from("schedules")
             .select()
             .decodeList<Schedule>()
     }
 
-    suspend fun addSchedule(
-        schedule: Schedule
-    ) {
-
+    suspend fun addSchedule(schedule: Schedule) {
         client
             .from("schedules")
             .insert(schedule)
     }
 
-    suspend fun deleteSchedule(
-        scheduleId: String
-    ) {
+    suspend fun deleteSchedule(scheduleId: String) {
+        if (scheduleId.isBlank()) return  // guard
 
         client
             .from("schedules")
             .delete {
-
                 filter {
-
                     eq("id", scheduleId)
                 }
             }
@@ -44,6 +37,7 @@ class ScheduleRepository {
         scheduleId: String,
         status: Boolean
     ) {
+        if (scheduleId.isBlank()) return  // guard — ini yang bikin bug centang
 
         client
             .from("schedules")
@@ -52,9 +46,7 @@ class ScheduleRepository {
                     set("status", status)
                 }
             ) {
-
                 filter {
-
                     eq("id", scheduleId)
                 }
             }
