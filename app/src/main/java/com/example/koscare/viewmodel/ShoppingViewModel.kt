@@ -40,9 +40,18 @@ class ShoppingViewModel : ViewModel() {
         }
     }
 
+    private fun refreshItems() {
+        viewModelScope.launch {
+            try {
+                _items.value = repository.getItems()
+            } catch (e: Exception) {
+                _errorMessage.value = "Gagal memperbarui daftar. Coba lagi."
+            }
+        }
+    }
+
     fun addItem(itemName: String, quantity: Int, imageUrl: String?) {
         viewModelScope.launch {
-            _isLoading.value = true
             _errorMessage.value = null
             try {
                 val user = SupabaseClientProvider.client.auth.currentUserOrNull()
@@ -50,19 +59,20 @@ class ShoppingViewModel : ViewModel() {
                     _errorMessage.value = "Sesi kamu sudah berakhir. Silakan login ulang."
                     return@launch
                 }
-                repository.addItem(
-                    ShoppingItem(
-                        user_id = user.id,
-                        item_name = itemName.trim(),
-                        quantity = quantity,
-                        image_url = imageUrl
-                    )
+                val newItem = ShoppingItem(
+                    user_id = user.id,
+                    item_name = itemName.trim(),
+                    quantity = quantity,
+                    image_url = imageUrl
                 )
-                getItems()
+
+                _items.value = _items.value + newItem
+
+                repository.addItem(newItem)
+                refreshItems()
             } catch (e: Exception) {
                 _errorMessage.value = "Gagal menambah item. Coba lagi ya."
-            } finally {
-                _isLoading.value = false
+                refreshItems()
             }
         }
     }
@@ -70,10 +80,11 @@ class ShoppingViewModel : ViewModel() {
     fun deleteItem(itemId: String) {
         viewModelScope.launch {
             try {
+                _items.value = _items.value.filter { it.id != itemId }
                 repository.deleteItem(itemId)
-                getItems()
             } catch (e: Exception) {
                 _errorMessage.value = "Gagal menghapus item. Coba lagi."
+                refreshItems()
             }
         }
     }
@@ -81,10 +92,13 @@ class ShoppingViewModel : ViewModel() {
     fun updateBoughtStatus(item: ShoppingItem) {
         viewModelScope.launch {
             try {
+                _items.value = _items.value.map {
+                    if (it.id == item.id) it.copy(is_bought = !it.is_bought) else it
+                }
                 repository.updateBoughtStatus(item)
-                getItems()
             } catch (e: Exception) {
                 _errorMessage.value = "Gagal memperbarui status item. Coba lagi."
+                refreshItems()
             }
         }
     }

@@ -8,7 +8,6 @@ import com.example.koscare.data.repository.ExpenseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 class ExpenseViewModel : ViewModel() {
 
@@ -38,6 +37,16 @@ class ExpenseViewModel : ViewModel() {
         }
     }
 
+    private fun refreshExpenses() {
+        viewModelScope.launch {
+            try {
+                _expenses.value = repository.getExpenses()
+            } catch (e: Exception) {
+                _errorMessage.value = "Gagal memperbarui pengeluaran. Coba lagi."
+            }
+        }
+    }
+
     fun addExpense(title: String, amount: String) {
         val parsedAmount = amount.trim().toIntOrNull()
         if (parsedAmount == null || parsedAmount <= 0) {
@@ -46,34 +55,36 @@ class ExpenseViewModel : ViewModel() {
         }
         viewModelScope.launch {
             _errorMessage.value = null
-            _isLoading.value = true
             try {
                 val userId = authRepository.getCurrentUserId()
                 if (userId == null) {
                     _errorMessage.value = "Sesi kamu sudah berakhir. Silakan login ulang."
                     return@launch
                 }
+                val today = run {
+                    val cal = java.util.Calendar.getInstance()
+                    String.format(
+                        java.util.Locale.getDefault(),
+                        "%04d-%02d-%02d",
+                        cal.get(java.util.Calendar.YEAR),
+                        cal.get(java.util.Calendar.MONTH) + 1,
+                        cal.get(java.util.Calendar.DAY_OF_MONTH)
+                    )
+                }
                 val expense = Expense(
                     user_id = userId,
                     title = title.trim(),
                     amount = parsedAmount,
-                    expense_date = run {
-                        val cal = java.util.Calendar.getInstance()
-                        String.format(
-                            java.util.Locale.getDefault(),
-                            "%04d-%02d-%02d",
-                            cal.get(java.util.Calendar.YEAR),
-                            cal.get(java.util.Calendar.MONTH) + 1,
-                            cal.get(java.util.Calendar.DAY_OF_MONTH)
-                        )
-                    }
+                    expense_date = today
                 )
+
+                _expenses.value = _expenses.value + expense
+
                 repository.addExpense(expense)
-                getExpenses()
+                refreshExpenses()
             } catch (e: Exception) {
                 _errorMessage.value = "Gagal menambah pengeluaran."
-            } finally {
-                _isLoading.value = false
+                refreshExpenses()
             }
         }
     }
@@ -81,10 +92,11 @@ class ExpenseViewModel : ViewModel() {
     fun deleteExpense(expenseId: String) {
         viewModelScope.launch {
             try {
+                _expenses.value = _expenses.value.filter { it.id != expenseId }
                 repository.deleteExpense(expenseId)
-                getExpenses()
             } catch (e: Exception) {
                 _errorMessage.value = "Gagal menghapus pengeluaran."
+                refreshExpenses()
             }
         }
     }

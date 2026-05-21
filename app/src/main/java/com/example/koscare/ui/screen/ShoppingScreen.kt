@@ -33,7 +33,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.koscare.ui.theme.Background
 import com.example.koscare.ui.theme.Emerald
 import com.example.koscare.viewmodel.ShoppingViewModel
-
+import coil.compose.AsyncImage
+import androidx.compose.foundation.layout.wrapContentHeight
 @Composable
 fun ShoppingScreen(
     shoppingViewModel: ShoppingViewModel = viewModel()
@@ -84,7 +85,7 @@ fun ShoppingScreen(
                 ) {
                     Column(modifier = Modifier.padding(18.dp)) {
                         Text(
-                            text = "🛒 Tambah Item",
+                            text = "Tambahkan Item",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF111827)
@@ -134,7 +135,7 @@ fun ShoppingScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Foto dipilih ✓",
+                                text = "Foto berhasil dipilih",
                                 color = Emerald,
                                 fontSize = 12.sp
                             )
@@ -249,12 +250,11 @@ fun ShoppingScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (item.is_bought)
-                            Emerald.copy(alpha = 0.1f)
-                        else
-                            Color.White
+                        containerColor = if (item.is_bought) Emerald else Color.White
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = if (item.is_bought) 0.dp else 4.dp
+                    )
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         item.image_url?.let { imageUrl ->
@@ -280,18 +280,19 @@ fun ShoppingScreen(
                                 Text(
                                     text = item.item_name,
                                     style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (item.is_bought) Color.White else Color.Black
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = "Jumlah: ${item.quantity}",
-                                    color = Color.Gray,
+                                    color = if (item.is_bought) Color.White.copy(alpha = 0.85f) else Color.Gray,
                                     fontSize = 13.sp
                                 )
                                 if (item.is_bought) {
                                     Text(
-                                        text = "✓ Sudah dibeli",
-                                        color = Emerald,
+                                        text = "Barang sudah dibeli",
+                                        color = Color.White,
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.SemiBold
                                     )
@@ -302,7 +303,7 @@ fun ShoppingScreen(
                                     Icon(
                                         imageVector = Icons.Default.Done,
                                         contentDescription = "Tandai dibeli",
-                                        tint = if (item.is_bought) Emerald else Color.Gray
+                                        tint = if (item.is_bought) Color.White else Color.Gray
                                     )
                                 }
                                 IconButton(onClick = {
@@ -311,7 +312,7 @@ fun ShoppingScreen(
                                     Icon(
                                         imageVector = Icons.Default.Delete,
                                         contentDescription = "Hapus",
-                                        tint = Color(0xFFEF4444)
+                                        tint = if (item.is_bought) Color.White else Color(0xFFEF4444)
                                     )
                                 }
                             }
@@ -323,17 +324,25 @@ fun ShoppingScreen(
             item { Spacer(modifier = Modifier.height(80.dp)) }
         }
 
-        // Dialog preview foto
         previewImage?.let { imageUrl ->
-            Dialog(onDismissRequest = { previewImage = null }) {
-                Card(shape = RoundedCornerShape(24.dp)) {
-                    Image(
-                        painter = rememberAsyncImagePainter(imageUrl),
+            Dialog(
+                onDismissRequest = { previewImage = null },
+                properties = androidx.compose.ui.window.DialogProperties(
+                    usePlatformDefaultWidth = false
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                        .clickable { previewImage = null },
+                    contentAlignment = Alignment.Center
+                ) {
+                    AsyncImage(
+                        model = imageUrl,
                         contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(400.dp),
-                        contentScale = ContentScale.Fit
+                        modifier = Modifier.fillMaxWidth(),
+                        contentScale = ContentScale.FillWidth
                     )
                 }
             }

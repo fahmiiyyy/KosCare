@@ -32,6 +32,8 @@ import coil.compose.AsyncImage
 import com.example.koscare.ui.theme.Background
 import com.example.koscare.ui.theme.Emerald
 import com.example.koscare.viewmodel.ProfileViewModel
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.ui.window.DialogProperties
 
 @Composable
 fun ProfileScreen(
@@ -248,14 +250,21 @@ fun ProfileScreen(
     if (showImageDialog) {
         val imageModel = imageUri ?: profile?.profile_image_url
         if (imageModel != null) {
-            Dialog(onDismissRequest = {
-                showImageDialog = false
-                scale = 1f
-            }) {
+            Dialog(
+                onDismissRequest = {
+                    showImageDialog = false
+                    scale = 1f
+                },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Black),
+                        .background(Color.Black)
+                        .clickable {
+                            showImageDialog = false
+                            scale = 1f
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     AsyncImage(
@@ -263,13 +272,14 @@ fun ProfileScreen(
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .wrapContentHeight()
                             .graphicsLayer(scaleX = scale, scaleY = scale)
                             .pointerInput(Unit) {
                                 detectTransformGestures { _, _, zoom, _ ->
                                     scale = (scale * zoom).coerceIn(1f, 5f)
                                 }
                             },
-                        contentScale = ContentScale.Fit
+                        contentScale = ContentScale.FillWidth
                     )
                 }
             }

@@ -38,6 +38,16 @@ class ScheduleViewModel : ViewModel() {
         }
     }
 
+    private fun refreshSchedules() {
+        viewModelScope.launch {
+            try {
+                _schedules.value = repository.getSchedules()
+            } catch (e: Exception) {
+                _errorMessage.value = "Gagal memperbarui jadwal. Coba lagi."
+            }
+        }
+    }
+
     fun addSchedule(
         title: String,
         description: String,
@@ -45,7 +55,6 @@ class ScheduleViewModel : ViewModel() {
         scheduleTime: String
     ) {
         viewModelScope.launch {
-            _isLoading.value = true
             _errorMessage.value = null
             try {
                 val userId = client.auth.currentUserOrNull()?.id
@@ -53,20 +62,24 @@ class ScheduleViewModel : ViewModel() {
                     _errorMessage.value = "Sesi kamu sudah berakhir. Silakan login ulang."
                     return@launch
                 }
-                repository.addSchedule(
-                    Schedule(
-                        title = title.trim(),
-                        description = description.trim(),
-                        schedule_date = scheduleDate,
-                        schedule_time = scheduleTime,
-                        user_id = userId
-                    )
+
+                val newSchedule = Schedule(
+                    title = title.trim(),
+                    description = description.trim(),
+                    schedule_date = scheduleDate,
+                    schedule_time = scheduleTime,
+                    user_id = userId,
+                    status = false
                 )
-                getSchedules()
+
+                _schedules.value = _schedules.value + newSchedule
+
+                repository.addSchedule(newSchedule)
+                refreshSchedules()
+
             } catch (e: Exception) {
                 _errorMessage.value = "Gagal menambah jadwal. Coba lagi ya."
-            } finally {
-                _isLoading.value = false
+                refreshSchedules()
             }
         }
     }
@@ -74,10 +87,11 @@ class ScheduleViewModel : ViewModel() {
     fun deleteSchedule(scheduleId: String) {
         viewModelScope.launch {
             try {
+                _schedules.value = _schedules.value.filter { it.id != scheduleId }
                 repository.deleteSchedule(scheduleId)
-                getSchedules()
             } catch (e: Exception) {
                 _errorMessage.value = "Gagal menghapus jadwal. Coba lagi."
+                refreshSchedules()
             }
         }
     }
@@ -85,13 +99,16 @@ class ScheduleViewModel : ViewModel() {
     fun updateStatus(schedule: Schedule) {
         viewModelScope.launch {
             try {
+                _schedules.value = _schedules.value.map {
+                    if (it.id == schedule.id) it.copy(status = !it.status) else it
+                }
                 repository.updateScheduleStatus(
                     scheduleId = schedule.id ?: return@launch,
                     status = !schedule.status
                 )
-                getSchedules()
             } catch (e: Exception) {
                 _errorMessage.value = "Gagal memperbarui status. Coba lagi."
+                refreshSchedules()
             }
         }
     }
