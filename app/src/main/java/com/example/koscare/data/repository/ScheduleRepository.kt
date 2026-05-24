@@ -1,54 +1,58 @@
 package com.example.koscare.data.repository
 
 import com.example.koscare.data.model.Schedule
-import com.example.koscare.data.remote.SupabaseClientProvider
-import io.github.jan.supabase.postgrest.from
+import com.example.koscare.data.remote.RetrofitClient
+import com.example.koscare.data.remote.ScheduleApiService
 
 class ScheduleRepository {
 
-    private val client = SupabaseClientProvider.client
+    private val apiService =
+        RetrofitClient
+            .retrofit
+            .create(
+                ScheduleApiService::class.java
+            )
 
-    suspend fun getSchedules(): List<Schedule> {
-        return client
-            .from("schedules")
-            .select()
-            .decodeList<Schedule>()
+    suspend fun getSchedules(
+        userId: String
+    ): List<Schedule> {
+
+        val response =
+            apiService.getSchedules(
+                userId = "eq.$userId"
+            )
+
+        return response.body() ?: emptyList()
     }
 
-    suspend fun addSchedule(schedule: Schedule) {
-        client
-            .from("schedules")
-            .insert(schedule)
+    suspend fun addSchedule(
+        schedule: Schedule
+    ) {
+
+        apiService.addSchedule(schedule)
     }
 
-    suspend fun deleteSchedule(scheduleId: String) {
-        if (scheduleId.isBlank()) return  // guard
+    suspend fun deleteSchedule(
+        scheduleId: String
+    ) {
 
-        client
-            .from("schedules")
-            .delete {
-                filter {
-                    eq("id", scheduleId)
-                }
-            }
+        apiService.deleteSchedule(
+            id = "eq.$scheduleId"
+        )
     }
 
     suspend fun updateScheduleStatus(
         scheduleId: String,
         status: Boolean
     ) {
-        if (scheduleId.isBlank()) return  // guard — ini yang bikin bug centang
 
-        client
-            .from("schedules")
-            .update(
-                {
-                    set("status", status)
-                }
-            ) {
-                filter {
-                    eq("id", scheduleId)
-                }
-            }
+        apiService.updateScheduleStatus(
+
+            id = "eq.$scheduleId",
+
+            body = mapOf(
+                "status" to status
+            )
+        )
     }
 }

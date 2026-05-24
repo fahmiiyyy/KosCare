@@ -80,4 +80,11 @@ dependencies {
     implementation("androidx.compose.runtime:runtime")
 
     implementation("io.ktor:ktor-client-content-negotiation:2.3.11")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+    // OkHttp
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 }

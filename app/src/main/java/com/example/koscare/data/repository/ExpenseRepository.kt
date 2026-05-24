@@ -1,42 +1,43 @@
 package com.example.koscare.data.repository
 
 import com.example.koscare.data.model.Expense
-import com.example.koscare.data.remote.SupabaseClientProvider
-import io.github.jan.supabase.postgrest.from
+import com.example.koscare.data.remote.ExpenseApiService
+import com.example.koscare.data.remote.RetrofitClient
 
 class ExpenseRepository {
 
-    private val client = SupabaseClientProvider.client
+    private val apiService =
+        RetrofitClient
+            .retrofit
+            .create(
+                ExpenseApiService::class.java
+            )
 
-    suspend fun getExpenses(): List<Expense> {
+    suspend fun getExpenses(
+        userId: String
+    ): List<Expense> {
 
-        return client
-            .from("expenses")
-            .select()
-            .decodeList<Expense>()
+        val response =
+            apiService.getExpenses(
+                userId = "eq.$userId"
+            )
+
+        return response.body() ?: emptyList()
     }
 
     suspend fun addExpense(
         expense: Expense
     ) {
 
-        client
-            .from("expenses")
-            .insert(expense)
+        apiService.addExpense(expense)
     }
 
     suspend fun deleteExpense(
         expenseId: String
     ) {
 
-        client
-            .from("expenses")
-            .delete {
-
-                filter {
-
-                    eq("id", expenseId)
-                }
-            }
+        apiService.deleteExpense(
+            id = "eq.$expenseId"
+        )
     }
 }
