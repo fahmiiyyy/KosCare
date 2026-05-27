@@ -57,7 +57,7 @@ class AuthViewModel : ViewModel() {
     fun logout() {
         viewModelScope.launch {
             repository.logout()
-            _isSuccess.value = false  // ← reset agar LoginScreen tidak auto-login lagi
+            _isSuccess.value = false
         }
     }
 

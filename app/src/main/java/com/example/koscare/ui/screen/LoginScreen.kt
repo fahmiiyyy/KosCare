@@ -92,7 +92,7 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = if (isLoginMode)
-                            "Selamat datang kembali 👋"
+                            "Selamat datang kembali"
                         else
                             "Buat akun baru untuk mulai",
                         fontSize = 13.sp,
@@ -158,7 +158,6 @@ fun LoginScreen(
                         shape = RoundedCornerShape(16.dp)
                     )
 
-                    // Pesan error
                     val displayError = localError ?: errorMessage
                     if (displayError != null) {
                         Spacer(modifier = Modifier.height(10.dp))
