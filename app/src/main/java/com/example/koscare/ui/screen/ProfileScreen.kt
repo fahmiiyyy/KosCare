@@ -97,7 +97,6 @@ fun ProfileScreen(
                     contentScale = ContentScale.Crop
                 )
             } else {
-                // Placeholder saat belum ada foto
                 Box(
                     modifier = Modifier
                         .size(120.dp)
@@ -151,14 +150,6 @@ fun ProfileScreen(
             singleLine = true
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Email tidak bisa diubah.",
-            fontSize = 12.sp,
-            color = Color.Gray,
-            modifier = Modifier.align(Alignment.Start)
-        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -246,7 +237,7 @@ fun ProfileScreen(
         }
     }
 
-    // Dialog preview foto fullscreen
+    //  Preview foto fullscreen
     if (showImageDialog) {
         val imageModel = imageUri ?: profile?.profile_image_url
         if (imageModel != null) {

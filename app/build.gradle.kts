@@ -87,4 +87,18 @@ dependencies {
 
     // OkHttp
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // Unit Test
+    testImplementation("junit:junit:4.13.2")
+
+    // Android Instrumented Test
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // Compose UI Test
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+    // Debug test
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

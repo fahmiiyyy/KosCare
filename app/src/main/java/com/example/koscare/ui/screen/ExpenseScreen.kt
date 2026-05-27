@@ -50,7 +50,6 @@ fun ExpenseScreen(
             .padding(18.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Header
         item {
             Text(
                 text = "Expense Tracker",
@@ -112,7 +111,6 @@ fun ExpenseScreen(
             }
         }
 
-        // Form tambah
         item {
             Card(
                 shape = RoundedCornerShape(24.dp),
@@ -157,7 +155,6 @@ fun ExpenseScreen(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
 
-                    // Error message
                     errorMessage?.let {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
@@ -244,7 +241,6 @@ fun ExpenseScreen(
             }
         }
 
-        // Loading
         if (isLoading) {
             item {
                 Box(
